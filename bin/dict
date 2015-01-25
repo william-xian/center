@@ -1,0 +1,34 @@
+#! /bin/bash
+GREEN="\033[1;32m";
+DEFAULT="\033[0;49m";
+BOLD="\033[1m";
+UNDERLINE="\033[4m";
+NORMAL="\033[m";
+RED="\033[1;31m"
+
+data=$(/home/william/bin/dictdata $@ 2>/dev/null|tr '\n' '^');
+data=${data//^/\\n}
+len=0;
+array=();
+until [  ${#data} = 0 ];
+do
+	array[$len]=${data##*#}
+	len=$(($len + 1))
+	data=${data%#*}
+done
+
+wdpn="${array[4]} [${array[3]}]";
+wdpn=${wdpn//\\n/}
+mean=${array[2]/\\n/};
+mean=${mean%\\n};
+eman=${array[1]};
+sent=${array[0]/\\n/};
+sent=${sent%\\n};
+
+echo -e $RED$BOLD$wdpn$NORMAL
+echo -e $GREEN$mean $NORMAL
+#echo -e $GREEN$eman $NORMAL
+
+sent=${sent//\<b\>/$UNDERLINE$RED$BOLD}
+sent=${sent//\<\/b\>/$NORMAL}
+echo -e $sent

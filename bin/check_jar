@@ -1,0 +1,31 @@
+#!/bin/bash
+tmp="$0-tmp"
+tmp2="$0-tmp2"
+out=maps
+out2=mapjar
+echo "" > $out
+echo "" > $out2
+
+foreach "jar -tf _obj_ > $tmp; sed -e 's|$|--_obj_|' $tmp>> $out" $@
+sort $out > $tmp
+
+echo "" > $out
+last=""
+lastHeader=""
+for line in $(cat $tmp)
+do
+	header=${line%--*};
+	if [ "$header" == "$lastHeader" ];then
+		if [ "${header#*.class}" == "" ];then
+			echo $last >> $out;
+			echo $line >> $out;
+			echo "${last#*--} <-> ${line#*--}" >> $tmp2;
+		fi
+	fi
+	last=$line;
+	lastHeader=$header
+done
+
+sort -u $tmp2 > $out2
+
+rm -f $tmp $tmp2
